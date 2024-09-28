@@ -396,3 +396,26 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+.sonarqube/conf/Sonar-cs-none.ruleset
+.sonarqube/conf/Sonar-cs.ruleset
+.sonarqube/conf/Sonar-vbnet-none.ruleset
+.sonarqube/conf/Sonar-vbnet.ruleset
+.sonarqube/conf/SonarQubeAnalysisConfig.xml
+.sonarqube/conf/0/FilesToAnalyze.txt
+.sonarqube/conf/0/ProjectOutFolderPath.txt
+.sonarqube/conf/0/SonarProjectConfig.xml
+.sonarqube/conf/cs/SonarLint.xml
+.sonarqube/conf/vbnet/SonarLint.xml
+.sonarqube/out/AnalysisWarnings.S4NET.json
+.sonarqube/out/sonar-project.properties
+.sonarqube/out/.sonar/.sonar_lock
+.sonarqube/out/.sonar/report-task.txt
+.sonarqube/out/0/Issues.json
+.sonarqube/out/0/ProjectInfo.xml
+.sonarqube/out/0/output-cs/file-metadata.pb
+.sonarqube/out/0/output-cs/log.pb
+.sonarqube/out/0/output-cs/metrics.pb
+.sonarqube/out/0/output-cs/symrefs.pb
+.sonarqube/out/0/output-cs/token-cpd.pb
+.sonarqube/out/0/output-cs/token-type.pb
+.vscode/settings.json
