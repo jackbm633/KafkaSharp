@@ -12,3 +12,5 @@
 /KafkaSharpTests/obj
 /KafkaSharpTests/TestResults
 /obj/Debug/net8.0
+/.sonarqube
+/sonarqubecoverage

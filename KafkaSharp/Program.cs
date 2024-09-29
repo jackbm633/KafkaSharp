@@ -6,31 +6,42 @@ license that can be found in the LICENSE file or at
 https://opensource.org/licenses/MIT.
 */
 
+using Serilog;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
+using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 
 [assembly:CLSCompliant(true)]
 [assembly:ComVisible(false)]
 [assembly:InternalsVisibleTo("KafkaSharpTests")]
 namespace KafkaSharp
 {
-    internal static class Program
+    internal class Program
     {
+
+        static readonly byte[] mockOutput = [0, 0, 0, 0, 0, 0, 0, 7];
+        readonly ResourceManager rm = new ResourceManager("KafkaSharp.Resources", Assembly.GetExecutingAssembly());
+
+
         [ExcludeFromCodeCoverage(Justification = "Not calling any additional logic")]
         private static async Task Main()
         {
             using var tokenSource = new CancellationTokenSource();
-
-            await ListenAsync(tokenSource.Token);
-
+            using var log = new LoggerConfiguration()
+                .WriteTo.Console()
+                .CreateLogger();
+            var prog = new Program();
+            await prog.ListenAsync(tokenSource.Token);
         }
 
-        internal static async Task ListenAsync(CancellationToken token)
+        internal async Task ListenAsync(CancellationToken token)
         {
+
             var ipEndPoint = new IPEndPoint(IPAddress.Any, 9200);
             TcpListener listener = new(ipEndPoint);
 
@@ -41,7 +52,13 @@ namespace KafkaSharp
                 {
                     using TcpClient handler = await listener.AcceptTcpClientAsync(token);
                     await using NetworkStream stream = handler.GetStream();
-                    await stream.WriteAsync(Encoding.ASCII.GetBytes("Hello, World!"), token);
+                    byte[] buffer = new byte[1024];
+                    int readBytes;
+                    while ((readBytes = await stream.ReadAsync(buffer, token)) == buffer.Length)
+                    {
+                        Log.Information(rm.GetString("READ_BYTES_LOG", CultureInfo.CurrentUICulture)!, readBytes);
+                    }
+                    await stream.WriteAsync(mockOutput, token);
                 }
                 
             }
