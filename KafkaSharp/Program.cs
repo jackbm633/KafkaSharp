@@ -25,7 +25,7 @@ namespace KafkaSharp
     {
 
         static readonly byte[] mockOutput = [0, 0, 0, 0, 0, 0, 0, 7];
-        readonly ResourceManager rm = new ResourceManager("KafkaSharp.Resources", Assembly.GetExecutingAssembly());
+        readonly ResourceManager rm = new("KafkaSharp.Resources", typeof(Program).Assembly);
 
 
         [ExcludeFromCodeCoverage(Justification = "Not calling any additional logic")]
