@@ -14,3 +14,4 @@
 /obj/Debug/net8.0
 /.sonarqube
 /sonarqubecoverage
+/coverage.xml

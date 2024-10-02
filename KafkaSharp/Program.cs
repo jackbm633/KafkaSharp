@@ -11,7 +11,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -19,14 +18,12 @@ using System.Runtime.InteropServices;
 [assembly:CLSCompliant(true)]
 [assembly:ComVisible(false)]
 [assembly:InternalsVisibleTo("KafkaSharpTests")]
+[assembly:NeutralResourcesLanguage("en")]
 namespace KafkaSharp
 {
     internal class Program
     {
-
-        static readonly byte[] mockOutput = [0, 0, 0, 0, 0, 0, 0, 7];
         readonly ResourceManager rm = new("KafkaSharp.Resources", typeof(Program).Assembly);
-
 
         [ExcludeFromCodeCoverage(Justification = "Not calling any additional logic")]
         private static async Task Main()
