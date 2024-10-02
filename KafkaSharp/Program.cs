@@ -23,6 +23,9 @@ namespace KafkaSharp
 {
     internal class Program
     {
+        private const int INVALID_VERSION_ERROR = 35;
+        private const int MAX_API_VERSION = 4;
+        private const int API_VERSIONS_REQUEST_CODE = 18;
         readonly ResourceManager rm = new("KafkaSharp.Resources", typeof(Program).Assembly);
 
         [ExcludeFromCodeCoverage(Justification = "Not calling any additional logic")]
@@ -58,13 +61,21 @@ namespace KafkaSharp
                         request.AddRange(buffer.Take(readBytes));
                         Log.Information(rm.GetString("READ_BYTES_LOG", CultureInfo.CurrentUICulture)!, readBytes);
                     } while (readBytes == buffer.Length);
+                    var requestApiKey = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer.Skip(MAX_API_VERSION).Take(2).ToArray()));
+                    var requestApiVersion = IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer.Skip(6).Take(2).ToArray()));
+                    var correlationId = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(request.Skip(8).Take(MAX_API_VERSION).ToArray()));
 
-                    var correlationId = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(request.Skip(8).Take(4).ToArray()));
+                    
 
                     List<byte> response = [];
                     response.AddRange(BitConverter.GetBytes(0));
                     response.AddRange(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(correlationId)));
-                    
+
+                    if (requestApiKey == API_VERSIONS_REQUEST_CODE)
+                    {
+                        ProcessApiVersionsRequest(requestApiVersion, response);
+                    }
+
                     await stream.WriteAsync(response.ToArray(), token);
                 }
                 
@@ -72,6 +83,15 @@ namespace KafkaSharp
             finally
             {
                 listener.Stop();
+            }
+        }
+
+        private static void ProcessApiVersionsRequest(short requestApiVersion, List<byte> response)
+        {
+            if (requestApiVersion < 0 || requestApiVersion > MAX_API_VERSION)
+            {
+                // Add error code to response (35 = UNSUPPORTED_VERSION)
+                response.AddRange(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)INVALID_VERSION_ERROR)));
             }
         }
     }

@@ -21,7 +21,7 @@ namespace KafkaSharpTests
             // API request
             request.AddRange(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)18)));
             // API version
-            request.AddRange(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)3)));
+            request.AddRange(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)Random.Shared.Next(5, 65534))));
             var correlationId = Random.Shared.Next();
             request.AddRange(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(correlationId)));
 
@@ -40,6 +40,7 @@ namespace KafkaSharpTests
 
             // Assert
             Assert.AreEqual(correlationId, IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer.Skip(4).Take(4).ToArray())));
+            Assert.AreEqual(35, IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer.Skip(8).Take(2).ToArray())));
             // Cleanup
             await tokenSource.CancelAsync();
             tokenSource.Dispose();
