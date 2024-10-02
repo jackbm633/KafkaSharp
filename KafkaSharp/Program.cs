@@ -52,13 +52,23 @@ namespace KafkaSharp
                 {
                     using TcpClient handler = await listener.AcceptTcpClientAsync(token);
                     await using NetworkStream stream = handler.GetStream();
+                    List<byte> request = [];
                     byte[] buffer = new byte[1024];
                     int readBytes;
-                    while ((readBytes = await stream.ReadAsync(buffer, token)) == buffer.Length)
+                    do 
                     {
+                        readBytes = await stream.ReadAsync(buffer, token);
+                        request.AddRange(buffer.Take(readBytes));
                         Log.Information(rm.GetString("READ_BYTES_LOG", CultureInfo.CurrentUICulture)!, readBytes);
-                    }
-                    await stream.WriteAsync(mockOutput, token);
+                    } while (readBytes == buffer.Length);
+
+                    var correlationId = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(request.Skip(8).Take(4).ToArray()));
+
+                    List<byte> response = [];
+                    response.AddRange(BitConverter.GetBytes(0));
+                    response.AddRange(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(correlationId)));
+                    
+                    await stream.WriteAsync(response.ToArray(), token);
                 }
                 
             }
